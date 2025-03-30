@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APIClinica", "APIClinica\APIClinica.csproj", "{ACBA8884-CF0E-4907-BA6E-EC52D6F0AAAF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ACBA8884-CF0E-4907-BA6E-EC52D6F0AAAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACBA8884-CF0E-4907-BA6E-EC52D6F0AAAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACBA8884-CF0E-4907-BA6E-EC52D6F0AAAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACBA8884-CF0E-4907-BA6E-EC52D6F0AAAF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {72919D94-1EF2-4C21-A5AB-5E2A42E0D017}
+	EndGlobalSection
+EndGlobal

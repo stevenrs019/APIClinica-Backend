@@ -1,0 +1,21 @@
+﻿# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build
+bin/
+obj/
+out/
+
+# Sistema
+*.DS_Store
+*.log
+*.db
+*.db-shm
+*.db-wal
+Thumbs.db
+
+# Configuración local
+appsettings.json
+appsettings.*.json
