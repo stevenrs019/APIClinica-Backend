@@ -1,4 +1,5 @@
 ﻿using APIClinica.Models;
+using APIClinica.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 
 namespace APIClinica.Data

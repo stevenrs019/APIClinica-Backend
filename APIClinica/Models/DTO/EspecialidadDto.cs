@@ -1,4 +1,6 @@
-﻿namespace APIClinica.Models.DTO
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace APIClinica.Models.DTO
 {
     public class EspecialidadDto
     {
