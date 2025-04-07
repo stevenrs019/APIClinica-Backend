@@ -135,5 +135,83 @@ namespace APIClinica.Data.Entidades
 
             return res;
         }
+
+        public Response ObtenerCitasPorDia(int idMedico, int dia, int mes, int anio)
+        {
+            Response res = new Response();
+            var connection = _context.Database.GetDbConnection();
+
+            try
+            {
+                connection.Open();
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "SP_OBTENER_CITAS_POR_DIA";
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+
+                    command.Parameters.Add(new SqlParameter("@ID_MEDICO", idMedico));
+                    command.Parameters.Add(new SqlParameter("@DIA", dia));
+                    command.Parameters.Add(new SqlParameter("@MES", mes));
+                    command.Parameters.Add(new SqlParameter("@ANIO", anio));
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            int code = Convert.ToInt32(reader["code"]);
+                            string message = reader["message"]?.ToString() ?? "";
+
+                            res.Code = code == 0 ? (int)ResultCode.Exito : (int)ResultCode.ErrorBaseDatos;
+                            res.Message = message;
+
+                            // 🔥 IMPORTANTE: avanzar al siguiente resultado
+                            if (code == 0 && reader.NextResult())
+                            {
+                                var citas = new List<object>();
+
+                                while (reader.Read())
+                                {
+                                    citas.Add(new
+                                    {
+                                        ID_CITA = reader["ID_CITA"],
+                                        ID_MEDICO = reader["ID_MEDICO"],
+                                        ID_PACIENTE = reader["ID_PACIENTE"],
+                                        ID_HORARIO = reader["ID_HORARIO"],
+                                        DIA = reader["DIA"],
+                                        MES = reader["MES"],
+                                        ANIO = reader["ANIO"],
+                                        NOMBRE_PACIENTE = reader["NOMBRE_PACIENTE"],
+                                        HORA_INICIO = reader["HORA_INICIO"],
+                                        HORA_FIN = reader["HORA_FIN"],
+                                        ESTADO = reader["ESTADO"]
+                                    });
+                                }
+
+                                res.Content = citas;
+                            }
+                        }
+                        else
+                        {
+                            res.Code = (int)ResultCode.SP_SinRespuesta;
+                            res.Message = "El procedimiento no devolvió respuesta.";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Code = (int)ResultCode.ErrorDesconocidoBaseDatos;
+                res.Message = "Se ha presentado un inconveniente";
+                res.Content = ex.Message;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return res;
+        }
+
     }
 }

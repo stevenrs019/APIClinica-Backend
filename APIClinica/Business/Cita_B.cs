@@ -74,5 +74,20 @@ namespace APIClinica.Business
                 };
             }
         }
+
+        public Response ObtenerCitasPorDia(int idMedico, int dia, int mes, int anio)
+        {
+            if (idMedico <= 0 || dia <= 0 || mes <= 0 || anio <= 0)
+            {
+                return new Response
+                {
+                    Code = (int)ResultCode.DatosIncompletos,
+                    Message = "Todos los campos son obligatorios para consultar las citas."
+                };
+            }
+
+            CitaDB citaRef = new CitaDB(_context);
+            return citaRef.ObtenerCitasPorDia(idMedico, dia, mes, anio);
+        }
     }
 }

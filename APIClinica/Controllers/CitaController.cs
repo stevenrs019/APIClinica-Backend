@@ -53,5 +53,12 @@ namespace APIClinica.Controllers
                 });
             }
         }
+
+        [HttpGet("citas-dia")]
+        public IActionResult ObtenerCitasPorDia([FromQuery] int idMedico, [FromQuery] int dia, [FromQuery] int mes, [FromQuery] int anio)
+        {
+            var result = _citaNegocio.ObtenerCitasPorDia(idMedico, dia, mes, anio);
+            return Ok(result);
+        }
     }
 }
