@@ -29,7 +29,7 @@ namespace APIClinica.Data.Entidades
                     command.CommandType = System.Data.CommandType.StoredProcedure;
 
                     command.Parameters.Add(new SqlParameter("@ID_MEDICO", cita.ID_MEDICO));
-                    command.Parameters.Add(new SqlParameter("@ID_PACIENTE", cita.ID_PACIENTE));
+                    command.Parameters.Add(new SqlParameter("@ID_USUARIO", cita.ID_USUARIO));
                     command.Parameters.Add(new SqlParameter("@ID_HORARIO", cita.ID_HORARIO));
                     command.Parameters.Add(new SqlParameter("@DIA", cita.DIA));
                     command.Parameters.Add(new SqlParameter("@MES", cita.MES));
@@ -136,7 +136,7 @@ namespace APIClinica.Data.Entidades
             return res;
         }
 
-        public Response ObtenerCitasPorDia(int idMedico, int dia, int mes, int anio)
+        public Response ObtenerCitasPorDia(int idUsuario, int dia, int mes, int anio)
         {
             Response res = new Response();
             var connection = _context.Database.GetDbConnection();
@@ -150,7 +150,7 @@ namespace APIClinica.Data.Entidades
                     command.CommandText = "SP_OBTENER_CITAS_POR_DIA";
                     command.CommandType = System.Data.CommandType.StoredProcedure;
 
-                    command.Parameters.Add(new SqlParameter("@ID_MEDICO", idMedico));
+                    command.Parameters.Add(new SqlParameter("@ID_USUARIO", idUsuario));
                     command.Parameters.Add(new SqlParameter("@DIA", dia));
                     command.Parameters.Add(new SqlParameter("@MES", mes));
                     command.Parameters.Add(new SqlParameter("@ANIO", anio));

@@ -3,6 +3,8 @@
     public class CitaDto
     {
         public int ID_CITA { get; set; }
+
+        public int ID_USUARIO { get; set; }
         public int ID_MEDICO { get; set; }
         public int ID_PACIENTE { get; set; }
         public int ID_HORARIO { get; set; }

@@ -20,7 +20,7 @@ namespace APIClinica.Business
             {
                 // Validación
                 if (cita.ID_MEDICO <= 0 ||
-                    cita.ID_PACIENTE <= 0 ||
+                    cita.ID_USUARIO <= 0 ||
                     cita.ID_HORARIO <= 0 ||
                     cita.DIA <= 0 ||
                     cita.MES <= 0 ||
@@ -75,9 +75,9 @@ namespace APIClinica.Business
             }
         }
 
-        public Response ObtenerCitasPorDia(int idMedico, int dia, int mes, int anio)
+        public Response ObtenerCitasPorDia(int idUsuario, int dia, int mes, int anio)
         {
-            if (idMedico <= 0 || dia <= 0 || mes <= 0 || anio <= 0)
+            if (idUsuario <= 0 || dia <= 0 || mes <= 0 || anio <= 0)
             {
                 return new Response
                 {
@@ -87,7 +87,7 @@ namespace APIClinica.Business
             }
 
             CitaDB citaRef = new CitaDB(_context);
-            return citaRef.ObtenerCitasPorDia(idMedico, dia, mes, anio);
+            return citaRef.ObtenerCitasPorDia(idUsuario, dia, mes, anio);
         }
     }
 }
