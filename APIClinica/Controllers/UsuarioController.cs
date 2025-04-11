@@ -1,10 +1,7 @@
 ﻿using APIClinica.Business;
-using APIClinica.Data;
 using APIClinica.Models.DTO;
 using APIClinica.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 
 namespace APIClinica.Controllers
 {
@@ -44,6 +41,44 @@ namespace APIClinica.Controllers
             try
             {
                 var resultado = _usuarioNegocio.LoginUsuario(login);
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Code = (int)ResultCode.ErrorInterno,
+                    message = "Ocurrió un error inesperado.",
+                    detail = ex.Message
+                });
+            }
+        }
+
+        [HttpPut("modificar/{id}")]
+        public IActionResult ModificarUsuario(int id, [FromBody] UsuarioDto usuario)
+        {
+            try
+            {
+                var resultado = _usuarioNegocio.ModificarUsuario(id, usuario);
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Code = (int)ResultCode.ErrorInterno,
+                    message = "Ocurrió un error inesperado.",
+                    detail = ex.Message
+                });
+            }
+        }
+
+        [HttpDelete("eliminar/{id}")]
+        public IActionResult EliminarUsuario(int id)
+        {
+            try
+            {
+                var resultado = _usuarioNegocio.EliminarUsuario(id);
                 return Ok(resultado);
             }
             catch (Exception ex)
