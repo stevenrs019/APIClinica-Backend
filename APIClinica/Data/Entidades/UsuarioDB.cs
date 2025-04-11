@@ -2,7 +2,6 @@
 using APIClinica.Models.DTO;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace APIClinica.Data.Entidades
 {
@@ -15,14 +14,14 @@ namespace APIClinica.Data.Entidades
             _context = context;
         }
 
-        public Response Insertar(UsuarioDto usuario) { 
+        public Response Insertar(UsuarioDto usuario)
+        {
             Response res = new Response();
             var connection = _context.Database.GetDbConnection();
-            
+
             try
             {
                 connection.Open();
-
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = "SP_INSERTAR_USUARIO";
@@ -44,15 +43,9 @@ namespace APIClinica.Data.Entidades
                         {
                             int messageId = Convert.ToInt32(reader["message_id"]);
                             string message = reader["message"]?.ToString() ?? "";
-                            if (messageId < 0)
-                            {
-                                res.Code = (int)ResultCode.ErrorBaseDatos;
-                            }
-                            else if (messageId == 0) {
-                                res.Code = (int)ResultCode.Exito;
-                            }
+
+                            res.Code = (messageId == 0) ? (int)ResultCode.Exito : (int)ResultCode.ErrorBaseDatos;
                             res.Message = message;
-                          
                         }
                         else
                         {
@@ -60,7 +53,6 @@ namespace APIClinica.Data.Entidades
                             res.Message = "El procedimiento no devolvió respuesta.";
                         }
                     }
-
                 }
             }
             catch (Exception ex)
@@ -69,9 +61,114 @@ namespace APIClinica.Data.Entidades
                 res.Message = "Se ha presentado un inconveniente";
                 res.Content = ex.Message;
             }
-            finally {
+            finally
+            {
                 connection.Close();
             }
+
+            return res;
+        }
+
+        public Response Modificar(int idUsuario, UsuarioDto usuario)
+        {
+            Response res = new Response();
+            var connection = _context.Database.GetDbConnection();
+
+            try
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "SP_MODIFICAR_USUARIO";
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+
+                    command.Parameters.Add(new SqlParameter("@ID_USUARIO", idUsuario));
+                    command.Parameters.Add(new SqlParameter("@NOMBRE", usuario.NOMBRE));
+                    command.Parameters.Add(new SqlParameter("@APELLIDO1", usuario.APELLIDO1));
+                    command.Parameters.Add(new SqlParameter("@APELLIDO2", usuario.APELLIDO2));
+                    command.Parameters.Add(new SqlParameter("@EDAD", usuario.EDAD));
+                    command.Parameters.Add(new SqlParameter("@TELEFONO", usuario.TELEFONO));
+                    command.Parameters.Add(new SqlParameter("@FECHA_NACIMIENTO", usuario.FECHA_NACIMIENTO));
+                    command.Parameters.Add(new SqlParameter("@EMAIL", usuario.EMAIL));
+                    command.Parameters.Add(new SqlParameter("@CONTRASENA", usuario.CONTRASENA));
+                    command.Parameters.Add(new SqlParameter("@ID_ROL", usuario.ID_ROL));
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            int messageId = Convert.ToInt32(reader["message_id"]);
+                            string message = reader["message"]?.ToString() ?? "";
+
+                            res.Code = (messageId == 0) ? (int)ResultCode.Exito : (int)ResultCode.ErrorBaseDatos;
+                            res.Message = message;
+                        }
+                        else
+                        {
+                            res.Code = (int)ResultCode.SP_SinRespuesta;
+                            res.Message = "El procedimiento no devolvió respuesta.";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Code = (int)ResultCode.ErrorDesconocidoBaseDatos;
+                res.Message = "Se ha presentado un inconveniente";
+                res.Content = ex.Message;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return res;
+        }
+
+        public Response Eliminar(int idUsuario)
+        {
+            Response res = new Response();
+            var connection = _context.Database.GetDbConnection();
+
+            try
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "SP_ELIMINAR_USUARIO";
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+
+                    command.Parameters.Add(new SqlParameter("@ID_USUARIO", idUsuario));
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            int messageId = Convert.ToInt32(reader["message_id"]);
+                            string message = reader["message"]?.ToString() ?? "";
+
+                            res.Code = (messageId == 0) ? (int)ResultCode.Exito : (int)ResultCode.ErrorBaseDatos;
+                            res.Message = message;
+                        }
+                        else
+                        {
+                            res.Code = (int)ResultCode.SP_SinRespuesta;
+                            res.Message = "El procedimiento no devolvió respuesta.";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Code = (int)ResultCode.ErrorDesconocidoBaseDatos;
+                res.Message = "Se ha presentado un inconveniente";
+                res.Content = ex.Message;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
             return res;
         }
 
@@ -100,7 +197,6 @@ namespace APIClinica.Data.Entidades
 
                             if (messageId == 0)
                             {
-                                // avanzar al segundo resultado
                                 if (reader.NextResult() && reader.Read())
                                 {
                                     var usuario = new
@@ -135,7 +231,6 @@ namespace APIClinica.Data.Entidades
                             res.Message = "El procedimiento no devolvió respuesta.";
                         }
                     }
-
                 }
             }
             catch (Exception ex)
@@ -151,6 +246,5 @@ namespace APIClinica.Data.Entidades
 
             return res;
         }
-
     }
 }

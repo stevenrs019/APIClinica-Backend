@@ -1,6 +1,8 @@
 using APIClinica.Data;
 using Microsoft.EntityFrameworkCore;
 using APIClinica.Configuration;
+using APIClinica.Business;
+using APIClinica.Data.Entidades;
 
 var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -26,7 +28,17 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ClinicaDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ClinicaDb")));
+
+builder.Services.AddScoped<Usuario_B>();
+builder.Services.AddScoped<UsuarioDB>();
+
+builder.Services.AddScoped<PacienteDB>();
+builder.Services.AddScoped<Paciente_B>();
+
+builder.Services.AddScoped<MedicoDB>();
+builder.Services.AddScoped<Medico_B>();
+
 
 var app = builder.Build();
 
