@@ -11,7 +11,7 @@
         public int DIA { get; set; }
         public int MES { get; set; }
         public int ANIO { get; set; }
-
+        public string TIPO_CITA { get; set; }
         public string NOMBRE_PACIENTE { get; set; } = string.Empty;
         public string HORA_INICIO { get; set; } = string.Empty;
         public string HORA_FIN { get; set; } = string.Empty;

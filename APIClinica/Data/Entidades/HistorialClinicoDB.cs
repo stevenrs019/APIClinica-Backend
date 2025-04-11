@@ -5,16 +5,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace APIClinica.Data.Entidades
 {
-    public class CitaDB
+    public class HistorialClinicoDB
     {
         private readonly ClinicaDbContext _context;
 
-        public CitaDB(ClinicaDbContext context)
+        public HistorialClinicoDB(ClinicaDbContext context)
         {
             _context = context;
         }
 
-        public Response AgendarCita(CitaDto cita)
+        public Response RegistrarHistorialClinico(HistorialClinicoDto historial)
         {
             Response res = new Response();
             var connection = _context.Database.GetDbConnection();
@@ -25,25 +25,22 @@ namespace APIClinica.Data.Entidades
 
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = "SP_AGENDAR_CITA";
+                    command.CommandText = "SP_REGISTRAR_HISTORIAL_CLINICO";
                     command.CommandType = System.Data.CommandType.StoredProcedure;
 
-                    command.Parameters.Add(new SqlParameter("@ID_MEDICO", cita.ID_MEDICO));
-                    command.Parameters.Add(new SqlParameter("@ID_USUARIO", cita.ID_USUARIO));
-                    command.Parameters.Add(new SqlParameter("@ID_HORARIO", cita.ID_HORARIO));
-                    command.Parameters.Add(new SqlParameter("@TIPO_CITA", cita.TIPO_CITA));
-                    command.Parameters.Add(new SqlParameter("@DIA", cita.DIA));
-                    command.Parameters.Add(new SqlParameter("@MES", cita.MES));
-                    command.Parameters.Add(new SqlParameter("@ANIO", cita.ANIO));
+                    command.Parameters.Add(new SqlParameter("@ID_CITA", historial.IdCita ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@PRESCRIPCION", historial.Prescripcion));
+                    command.Parameters.Add(new SqlParameter("@DIAGNOSTICO", historial.Diagnostico));
+                    command.Parameters.Add(new SqlParameter("@RECETA", historial.Receta)); 
 
                     using (var reader = command.ExecuteReader())
                     {
                         if (reader.Read())
                         {
-                            int messageId = Convert.ToInt32(reader["message_id"]);
+                            int code = Convert.ToInt32(reader["code"]);
                             string message = reader["message"]?.ToString() ?? "";
 
-                            res.Code = messageId == 0 ? (int)ResultCode.Exito : (int)ResultCode.ErrorBaseDatos;
+                            res.Code = code == 0 ? (int)ResultCode.Exito : (int)ResultCode.ErrorBaseDatos;
                             res.Message = message;
                         }
                         else
@@ -68,7 +65,7 @@ namespace APIClinica.Data.Entidades
             return res;
         }
 
-        public Response ObtenerDisponibilidad(DisponibilidadRequestDto request)
+        public Response ObtenerHistorialPorPaciente(int idPaciente)
         {
             Response res = new Response();
             var connection = _context.Database.GetDbConnection();
@@ -79,13 +76,10 @@ namespace APIClinica.Data.Entidades
 
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = "SP_OBTENER_DISPONIBILIDAD_MEDICO";
+                    command.CommandText = "SP_OBTENER_HISTORIAL_CLINICO";
                     command.CommandType = System.Data.CommandType.StoredProcedure;
 
-                    command.Parameters.Add(new SqlParameter("@ID_MEDICO", request.ID_MEDICO));
-                    command.Parameters.Add(new SqlParameter("@DIA", request.DIA));
-                    command.Parameters.Add(new SqlParameter("@MES", request.MES));
-                    command.Parameters.Add(new SqlParameter("@ANIO", request.ANIO));
+                    command.Parameters.Add(new SqlParameter("@ID_PACIENTE", idPaciente));
 
                     using (var reader = command.ExecuteReader())
                     {
@@ -97,100 +91,26 @@ namespace APIClinica.Data.Entidades
                             res.Code = code == 0 ? (int)ResultCode.Exito : (int)ResultCode.ErrorBaseDatos;
                             res.Message = message;
 
-                            if (code == 0)
-                            {
-                                var horarios = new List<object>();
-
-                                while (reader.Read())
-                                {
-                                    horarios.Add(new
-                                    {
-                                        ID_HORARIO = reader["ID_HORARIO"],
-                                        HORA_INICIO = reader["HORA_INICIO"],
-                                        HORA_FIN = reader["HORA_FIN"],
-                                        ESTADO = reader["ESTADO"]
-                                    });
-                                }
-
-                                res.Content = horarios;
-                            }
-                        }
-                        else
-                        {
-                            res.Code = (int)ResultCode.SP_SinRespuesta;
-                            res.Message = "El procedimiento no devolvió respuesta.";
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                res.Code = (int)ResultCode.ErrorDesconocidoBaseDatos;
-                res.Message = "Se ha presentado un inconveniente";
-                res.Content = ex.Message;
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-            return res;
-        }
-
-        public Response ObtenerCitasPorDia(int idUsuario, int dia, int mes, int anio)
-        {
-            Response res = new Response();
-            var connection = _context.Database.GetDbConnection();
-
-            try
-            {
-                connection.Open();
-
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = "SP_OBTENER_CITAS_POR_DIA";
-                    command.CommandType = System.Data.CommandType.StoredProcedure;
-
-                    command.Parameters.Add(new SqlParameter("@ID_USUARIO", idUsuario));
-                    command.Parameters.Add(new SqlParameter("@DIA", dia));
-                    command.Parameters.Add(new SqlParameter("@MES", mes));
-                    command.Parameters.Add(new SqlParameter("@ANIO", anio));
-
-                    using (var reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            int code = Convert.ToInt32(reader["code"]);
-                            string message = reader["message"]?.ToString() ?? "";
-
-                            res.Code = code == 0 ? (int)ResultCode.Exito : (int)ResultCode.ErrorBaseDatos;
-                            res.Message = message;
-
-                            // 🔥 IMPORTANTE: avanzar al siguiente resultado
                             if (code == 0 && reader.NextResult())
                             {
-                                var citas = new List<object>();
+                                var historial = new List<object>();
 
                                 while (reader.Read())
                                 {
-                                    citas.Add(new
+                                    historial.Add(new
                                     {
-                                        ID_CITA = reader["ID_CITA"],
-                                        ID_MEDICO = reader["ID_MEDICO"],
-                                        ID_PACIENTE = reader["ID_PACIENTE"],
-                                        ID_HORARIO = reader["ID_HORARIO"],
-                                        TIPO_CITA = reader["TIPO_CITA"],
+                                        ID_HISTORIAL = reader["ID_HISTORIAL"],
+                                        PRESCRIPCION = reader["PRESCRIPCION"],
+                                        DIAGNOSTICO = reader["DIAGNOSTICO"],
+                                        RECETA = reader["RECETA"],
                                         DIA = reader["DIA"],
                                         MES = reader["MES"],
                                         ANIO = reader["ANIO"],
-                                        NOMBRE_PACIENTE = reader["NOMBRE_PACIENTE"],
-                                        HORA_INICIO = reader["HORA_INICIO"],
-                                        HORA_FIN = reader["HORA_FIN"],
-                                        ESTADO = reader["ESTADO"]
+                                        NOMBRE_MEDICO = reader["NOMBRE_MEDICO"]
                                     });
                                 }
 
-                                res.Content = citas;
+                                res.Content = historial;
                             }
                         }
                         else
@@ -214,6 +134,79 @@ namespace APIClinica.Data.Entidades
 
             return res;
         }
+
+        public Response ObtenerHistorialPorCorreo(string correo)
+        {
+            Response res = new Response();
+            var connection = _context.Database.GetDbConnection();
+
+            try
+            {
+                connection.Open();
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "SP_OBTENER_HISTORIAL_CLINICO_POR_CORREO";
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+
+                    command.Parameters.Add(new SqlParameter("@CORREO", correo));
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            int code = Convert.ToInt32(reader["code"]);
+                            string message = reader["message"]?.ToString() ?? "";
+
+                            res.Code = code == 0 ? (int)ResultCode.Exito : (int)ResultCode.ErrorBaseDatos;
+                            res.Message = message;
+
+                            if (code == 0 && reader.NextResult())
+                            {
+                                var historial = new List<object>();
+
+                                while (reader.Read())
+                                {
+                                    historial.Add(new
+                                    {
+                                        ID_HISTORIAL = reader["ID_HISTORIAL"],
+                                        PRESCRIPCION = reader["PRESCRIPCION"],
+                                        DIAGNOSTICO = reader["DIAGNOSTICO"],
+                                        RECETA = reader["RECETA"],
+                                        DIA = reader["DIA"],
+                                        MES = reader["MES"],
+                                        ANIO = reader["ANIO"],
+                                        HORA_INICIO = reader["HORA_INICIO"],
+                                        HORA_FIN = reader["HORA_FIN"],
+                                        NOMBRE_MEDICO = reader["NOMBRE_MEDICO"]
+                                    });
+                                }
+
+                                res.Content = historial;
+                            }
+                        }
+                        else
+                        {
+                            res.Code = (int)ResultCode.SP_SinRespuesta;
+                            res.Message = "El procedimiento no devolvió respuesta.";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Code = (int)ResultCode.ErrorDesconocidoBaseDatos;
+                res.Message = "Se ha presentado un inconveniente";
+                res.Content = ex.Message;
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return res;
+        }
+
 
     }
 }
