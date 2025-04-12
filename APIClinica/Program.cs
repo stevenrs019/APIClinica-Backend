@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using APIClinica.Configuration;
 using APIClinica.Business;
 using APIClinica.Data.Entidades;
+using APIClinica.Services;
+using Resend;
 
 var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +40,7 @@ builder.Services.AddScoped<Paciente_B>();
 
 builder.Services.AddScoped<MedicoDB>();
 builder.Services.AddScoped<Medico_B>();
+
 
 
 var app = builder.Build();

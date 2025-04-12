@@ -45,6 +45,7 @@ namespace APIClinica.Data.Entidades
 
                             res.Code = messageId == 0 ? (int)ResultCode.Exito : (int)ResultCode.ErrorBaseDatos;
                             res.Message = message;
+
                         }
                         else
                         {
