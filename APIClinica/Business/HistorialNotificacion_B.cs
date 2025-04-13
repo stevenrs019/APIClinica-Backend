@@ -19,8 +19,7 @@ namespace APIClinica.Business
             try
             {
                 if (string.IsNullOrWhiteSpace(historial.EMAIL) ||
-                    historial.ID_TIPO_NOTIFICACION <= 0 ||
-                    historial.ID_NOTIFICACION <= 0)
+                    historial.ID_TIPO_NOTIFICACION <= 0)
                 {
                     return new Response
                     {

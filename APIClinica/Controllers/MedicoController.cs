@@ -12,6 +12,12 @@ public class MedicoController : ControllerBase
         _medicoNegocio = medicoNegocio;
     }
 
+    [HttpGet("obtener-por-especialidad/{idEspecialidad}")]
+    public IActionResult ObtenerMedicosPorEspecialidad(int idEspecialidad)
+    {
+        var response = _medicoNegocio.ObtenerPorEspecialidad(idEspecialidad);
+        return Ok(response);
+    }
     [HttpPost("insertar")]
     public IActionResult Insertar([FromBody] MedicoInsertarDto medico)
     {

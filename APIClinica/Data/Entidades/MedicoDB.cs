@@ -13,6 +13,73 @@ public class MedicoDB
         _context = context;
     }
 
+    public Response ObtenerMedicosPorEspecialidad(int idEspecialidad)
+    {
+        Response res = new Response();
+        var connection = _context.Database.GetDbConnection();
+
+        try
+        {
+            connection.Open();
+
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = "SP_OBTENER_MEDICOS_POR_ESPECIALIDAD";
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                command.Parameters.Add(new SqlParameter("@ID_ESPECIALIDAD", idEspecialidad));
+
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        int code = Convert.ToInt32(reader["code"]);
+                        string message = reader["message"]?.ToString() ?? "";
+
+                        res.Code = code == 0 ? (int)ResultCode.Exito : (int)ResultCode.ErrorBaseDatos;
+                        res.Message = message;
+
+                        if (code == 0 && reader.NextResult())
+                        {
+                            var lista = new List<MedicoEspecialidadDto>();
+
+                            while (reader.Read())
+                            {
+                                lista.Add(new MedicoEspecialidadDto
+                                {
+                                    IdMedico = Convert.ToInt32(reader["ID_MEDICO"]),
+                                    Nombre = reader["NOMBRE"].ToString(),
+                                    Apellido1 = reader["APELLIDO1"].ToString(),
+                                    Apellido2 = reader["APELLIDO2"].ToString(),
+                                    Telefono = reader["TELEFONO"].ToString(),
+                                    Especialidad = reader["ESPECIALIDAD"].ToString()
+                                });
+                            }
+
+                            res.Content = lista;
+                        }
+                    }
+                    else
+                    {
+                        res.Code = (int)ResultCode.SP_SinRespuesta;
+                        res.Message = "El procedimiento no devolvió respuesta.";
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            res.Code = (int)ResultCode.ErrorDesconocidoBaseDatos;
+            res.Message = "Error al obtener los médicos por especialidad.";
+            res.Content = ex.Message;
+        }
+        finally
+        {
+            connection.Close();
+        }
+
+        return res;
+    }
+
     public Response Insertar(MedicoInsertarDto medico)
     {
         Response res = new Response();

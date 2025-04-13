@@ -187,7 +187,8 @@ namespace APIClinica.Data.Entidades
                                         NOMBRE_PACIENTE = reader["NOMBRE_PACIENTE"],
                                         HORA_INICIO = reader["HORA_INICIO"],
                                         HORA_FIN = reader["HORA_FIN"],
-                                        ESTADO = reader["ESTADO"]
+                                        ESTADO = reader["ESTADO"],
+                                        EMAIL_PACIENTE = reader["EMAIL_PACIENTE"]
                                     });
                                 }
 
@@ -215,6 +216,7 @@ namespace APIClinica.Data.Entidades
 
             return res;
         }
+
 
     }
 }

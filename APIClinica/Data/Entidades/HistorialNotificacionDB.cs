@@ -29,8 +29,8 @@ namespace APIClinica.Data.Entidades
                     command.CommandType = System.Data.CommandType.StoredProcedure;
 
                     command.Parameters.Add(new SqlParameter("@ID_TIPO_NOTIFICACION", dto.ID_TIPO_NOTIFICACION));
-                    command.Parameters.Add(new SqlParameter("@ID_NOTIFICACION", dto.ID_NOTIFICACION));
                     command.Parameters.Add(new SqlParameter("@EMAIL", dto.EMAIL));
+                    command.Parameters.Add(new SqlParameter("@MENSAJE", dto.MENSAJE)); // 💬 Nuevo parámetro
 
                     using (var reader = command.ExecuteReader())
                     {
@@ -63,6 +63,7 @@ namespace APIClinica.Data.Entidades
 
             return res;
         }
+
 
         public Response Obtener()
         {
