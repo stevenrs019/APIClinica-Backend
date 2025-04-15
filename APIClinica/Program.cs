@@ -43,6 +43,9 @@ builder.Services.AddScoped<Paciente_B>();
 builder.Services.AddScoped<MedicoDB>();
 builder.Services.AddScoped<Medico_B>();
 
+builder.Services.AddScoped<CitaVirtual_B>();
+
+
 builder.Services.AddSingleton<EmailService>();
 builder.Services.AddSingleton<PdfService>();
 

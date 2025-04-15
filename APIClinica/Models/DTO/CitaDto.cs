@@ -18,6 +18,8 @@
         public string HORA_INICIO { get; set; } = string.Empty;
         public string HORA_FIN { get; set; } = string.Empty;
         public string ESTADO { get; set; } = string.Empty;
+
+        public string LINK_VIDEO { get; set; } = string.Empty;
     }
 
 }
